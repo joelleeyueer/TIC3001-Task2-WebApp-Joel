@@ -56,30 +56,20 @@ public class EmployeeRepository {
         }
     }
 
+    public Boolean insertEmployee(Employee employee){
+        int inserted = 0;
 
-    
-    public Boolean insertEmployee(Employee employee) {
-        KeyHolder generatedKeyHolder = new GeneratedKeyHolder(); //this is when u need to extract the auto incremented key from SQL
-
-        PreparedStatementCreator psc = new PreparedStatementCreator() {
+        inserted = jdbcTemplate.update(insertEmployeeSQL, new PreparedStatementSetter() {
             @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                //INSERT INTO Employee (name, age, job_title, salary) VALUES (?,?,?,?);
-                PreparedStatement ps = con.prepareStatement(insertEmployeeSQL, new String[] {"id"});
+            public void setValues(PreparedStatement ps) throws SQLException {
                 ps.setString(1, employee.getName());
                 ps.setInt(2, employee.getAge());
                 ps.setString(3, employee.getJobTitle());
-                ps.setInt(3, employee.getSalary());
-
-                return ps;
+                ps.setInt(4, employee.getSalary());
             }
-        };
+        });
 
-        jdbcTemplate.update(psc, generatedKeyHolder);
-
-        Integer returnedId = generatedKeyHolder.getKey().intValue();
-
-        return returnedId>0?true:false;
+        return inserted>0?true:false;
     }
 
     

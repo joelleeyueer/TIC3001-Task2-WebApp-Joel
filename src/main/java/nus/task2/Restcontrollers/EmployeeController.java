@@ -44,9 +44,13 @@ public class EmployeeController {
     }
 //q: insertemployee with queryparam
 //a: use requestparam
-    @PostMapping("/insert/{name}/{age}/{jobTitle}/{salary}")
-    public ResponseEntity<Employee> insertEmployee(@PathVariable("name") String name, @PathVariable("age") int age, @PathVariable("jobTitle") String jobTitle, @PathVariable("salary") int salary){
-        Employee employee = new Employee(name, age, jobTitle, salary);
+    @PostMapping("/insert")
+    public ResponseEntity<Employee> insertEmployee(@RequestParam("name") String name, @RequestParam("age") int age, @RequestParam("jobTitle") String jobTitle, @RequestParam("salary") int salary){
+        Employee employee = new Employee();
+        employee.setName(name);
+        employee.setAge(age);
+        employee.setJobTitle(jobTitle);
+        employee.setSalary(salary);
         Boolean result = employeeService.getInsertEmployee(employee);
 
         if (result == false){
@@ -54,11 +58,16 @@ public class EmployeeController {
                 HttpStatus.BAD_REQUEST, "employee not inserted");
             }
 
+            System.out.println("Successfully inserted " + name + " with age " + age + " with jobTitle " + jobTitle + " with salary " + salary);
         return new ResponseEntity<Employee>(HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Employee> updateSalaryByID(@PathVariable("id") int id, @RequestParam int salary){
+    //q: putmapping code for localhost:8080/api/employees/all?id=1&salary=1000
+    //a: use requestparam
+    //q: how to us requestparam for id
+
+    @PutMapping("/update")
+    public ResponseEntity<Employee> updateSalaryByID(@RequestParam("id") int id, @RequestParam("salary") int salary){
         int result = employeeService.getUpdateSalaryByID(id, salary);
 
         if (result == 0){
