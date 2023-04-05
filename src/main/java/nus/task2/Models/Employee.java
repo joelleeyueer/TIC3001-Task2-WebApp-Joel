@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Employee {
+    public Employee(int i, String string, int j, String string2, int k) {
+    }
     private String name;
     private int age;
     private String jobTitle;

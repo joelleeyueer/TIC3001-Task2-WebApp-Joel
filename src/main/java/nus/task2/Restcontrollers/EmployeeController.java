@@ -55,7 +55,7 @@ public class EmployeeController {
 
         if (result == false){
             throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST, "employee not inserted");
+                HttpStatus.NOT_FOUND, "employee not inserted");
             }
 
             System.out.println("Successfully inserted " + name + " with age " + age + " with jobTitle " + jobTitle + " with salary " + salary);
@@ -72,7 +72,7 @@ public class EmployeeController {
 
         if (result == 0){
             throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST, "employee not updated");
+                HttpStatus.NOT_FOUND, "employee not updated");
             }
             System.out.println("Successfully updated " + id + " with salary " + salary);
         return new ResponseEntity<Employee>(HttpStatus.OK);
@@ -84,7 +84,7 @@ public class EmployeeController {
 
         if (result == 0){
             throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST, "employee not deleted");
+                HttpStatus.NOT_FOUND, "employee not deleted");
             }
 
         System.out.println("Successfully deleted " + id);
