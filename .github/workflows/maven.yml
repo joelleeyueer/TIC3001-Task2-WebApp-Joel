@@ -23,7 +23,7 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: Ezrealkarmaj@kir0snip3r
         ports:
-        - 32574:3306
+        - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
@@ -37,7 +37,7 @@ jobs:
     - name: Verify MySQL connection from host
       run: |
         sudo apt-get install -y mysql-client
-        mysql --host 127.0.0.1 --port 3306 -uroot -pEzrealkarmaj@kir0snip3r -e "SHOW DATABASES"
+        mysql --host localhost --port 3306 -uroot -pEzrealkarmaj@kir0snip3r -e "SHOW DATABASES"
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
