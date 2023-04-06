@@ -59,7 +59,7 @@ public class EmployeeController {
             }
 
             System.out.println("Successfully inserted " + name + " with age " + age + " with jobTitle " + jobTitle + " with salary " + salary);
-        return new ResponseEntity<Employee>(HttpStatus.OK);
+        return new ResponseEntity<Employee>(employee, HttpStatus.OK);
     }
 
     //q: putmapping code for localhost:8080/api/employees/all?id=1&salary=1000
@@ -74,12 +74,14 @@ public class EmployeeController {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "employee not updated");
             }
-            System.out.println("Successfully updated " + id + " with salary " + salary);
-        return new ResponseEntity<Employee>(HttpStatus.OK);
+        System.out.println("Successfully updated " + id + " with salary " + salary);
+        Employee employee = employeeService.getFindEmployeeById(id);
+        return new ResponseEntity<Employee>(employee, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Employee> deleteEmployeeById(@PathVariable("id") int id){
+        Employee employee = employeeService.getFindEmployeeById(id);
         int result = employeeService.getDeleteEmployeeById(id);
 
         if (result == 0){
@@ -89,7 +91,7 @@ public class EmployeeController {
 
         System.out.println("Successfully deleted " + id);
 
-        return new ResponseEntity<Employee>(HttpStatus.OK);
+        return new ResponseEntity<Employee>(employee, HttpStatus.OK);
     }
 
 
