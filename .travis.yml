@@ -16,12 +16,11 @@ before_install:
   - mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'testuser'@'localhost';"
 
 script:
-  - mvn clean install -Dspring.profiles.active=test
-  - mvn test
+  - mvn test -Dtest=EmployeeServiceTest
 
 notifications:
   email:
     recipients:
       - sfmuleaccount@gmail.com
-    on_success: never
+    on_success: always
     on_failure: always
