@@ -38,9 +38,7 @@ public class EmployeeRepository {
             result = jdbcTemplate.query(findAllEmployees_SQL, BeanPropertyRowMapper.newInstance(Employee.class), limit, offset);
             return result;
 
-            //q: rg.springframework.jdbc.BadSqlGrammarException: PreparedStatementCallback; bad SQL grammar [SELECT * FROM Employee LIMIT ? OFFSET ?]; nested exception is java.sql.SQLSyntaxErrorException: Table 'Employee' doesn't exist
-            //a: https://stackoverflow.com/questions/50093144/spring-boot-jdbc-badsqlgrammarexception-bad-sql-grammar-select-from-employe
-
+            
     }
 
     public Employee findEmployeeById(int id){
