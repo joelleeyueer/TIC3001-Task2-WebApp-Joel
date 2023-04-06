@@ -19,7 +19,7 @@ jobs:
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: tic3001_task2
-          MYSQL_USER: user
+          MYSQL_USER: root
           MYSQL_PASSWORD: Ezrealkarmaj@kir0snip3r
 
     steps:
@@ -35,7 +35,7 @@ jobs:
     - name: Test with MySQL and Build with Maven
       env:
         DB_URL: jdbc:mysql://localhost:3306/tic3001_task2
-        DB_USERNAME: user
+        DB_USERNAME: root
         DB_PASSWORD: Ezrealkarmaj@kir0snip3r
       run: |
         mvn clean package
