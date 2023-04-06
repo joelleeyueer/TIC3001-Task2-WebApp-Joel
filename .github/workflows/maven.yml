@@ -15,6 +15,16 @@ on:
     branches: [ "main" ]
 
 jobs:
+  test-host:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: Ezrealkarmaj@kir0snip3r
+        ports:
+        - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
   build:
 
     runs-on: ubuntu-latest
@@ -27,36 +37,24 @@ jobs:
         java-version: '19'
         distribution: 'adopt'
         cache: maven
+    - name: Verify MySQL connection from host
+      run: |
+        sudo apt-get install -y mysql-client
+        mysql --host Joels-MacBook-Air.local --port 3306 -uroot -pEzrealkarmaj@kir0snip3r -e "SHOW DATABASES"
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
-    - name: Setup database
-      runs-on: ubuntu-latest
-      container: ubuntu
-      services:
-        mydb:
-          image: mysql:5.7
-          env:
-            MYSQL_ROOT_PASSWORD: Ezrealkarmaj@kir0snip3r
-          options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
-      steps:
-      - name: Verify MySQL connection from container 
-        run: |
-          apt-get update
-          apt-get install -y mysql-client
-          mysql --host mydb -uroot -pEzrealkarmaj@kir0snip3r-e "SHOW DATABASES"
-          
-      - name: Start MySQL
-        run: |
-          sudo service mysql start
-          mysql -u root -e "CREATE DATABASE IF NOT EXISTS tic3001_task2;"
-          mysql -u root -e "GRANT ALL PRIVILEGES ON tic3001_task2.* TO 'root'@'localhost' IDENTIFIED BY 'Ezrealkarmaj@kir0snip3r';"
-      - name: Test with MySQL
-        env:
-          DB_URL: jdbc:mysql://localhost:3306/tic3001_task2
-          DB_USERNAME: root
-          DB_PASSWORD: Ezrealkarmaj@kir0snip3r
-        run: mvn test
+    - name: Start MySQL
+      run: |
+        sudo service mysql start
+        mysql -u root -e "CREATE DATABASE IF NOT EXISTS tic3001_task2;"
+        mysql -u root -e "GRANT ALL PRIVILEGES ON tic3001_task2.* TO 'root'@'localhost' IDENTIFIED BY 'Ezrealkarmaj@kir0snip3r';"
+    - name: Test with MySQL
+      env:
+        DB_URL: jdbc:mysql://localhost:3306/tic3001_task2
+        DB_USERNAME: root
+        DB_PASSWORD: Ezrealkarmaj@kir0snip3r
+      run: mvn test
 
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
