@@ -5,17 +5,30 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.servlet.http.HttpServletRequest;
+import nus.task2.Components.JWTComponent;
+import nus.task2.Exceptions.UnauthorizedException;
+import nus.task2.Models.AuthenticationRequest;
 import nus.task2.Models.Employee;
+import nus.task2.Models.UserInfo;
+import nus.task2.Repositories.EmployeeRepository;
 import nus.task2.Services.EmployeeService;
 
 @RestController
@@ -25,14 +38,32 @@ public class EmployeeController {
     @Autowired
     EmployeeService employeeService;
 
+    @Autowired
+    EmployeeRepository employeeRepository;
+
+    @Autowired
+    JWTComponent jwtComponent;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    
+
     @GetMapping("/all")
-    public List<Employee> getAllCustomers(@RequestParam(defaultValue = "5", required=false) int limit, @RequestParam(defaultValue = "0", required=false) int offset){
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public List<Employee> getAllCustomers(@RequestParam(defaultValue = "5", required=false) int limit, @RequestParam(defaultValue = "0", required=false) int offset, HttpServletRequest request ){
+        
         return employeeService.getAllEmployees(limit, offset);
     }
     
 
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getOneCustomerById(@PathVariable("id") int id ){
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
+    public ResponseEntity<Employee> getOneCustomerById(@PathVariable("id") int id, HttpServletRequest request ){
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new AccessDeniedException("Missing or invalid authorization header");
+        }
         Employee incomingCustomer = employeeService.getFindEmployeeById(id);
 
         if (incomingCustomer == null){
@@ -93,6 +124,33 @@ public class EmployeeController {
 
         return new ResponseEntity<Employee>(employee, HttpStatus.OK);
     }
+
+    @PostMapping("/authenticate")
+    public String authenticateGetToken(@RequestBody AuthenticationRequest authRequest){
+        
+        System.out.println("authenticating user : " + authRequest.getUsername() + " with password : " + authRequest.getPassword());
+
+        System.out.println("in authentication");
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+        if (authentication.isAuthenticated()) {
+            return jwtComponent.generateToken(authRequest.getUsername());
+        } else {
+            throw new UsernameNotFoundException("invalid user request !");
+        }
+    }
+
+    @GetMapping("/userInfo")
+    public void getUserInfo(){
+        List<UserInfo> userInfo = employeeRepository.getUserInfo();
+        System.out.println(userInfo);
+    }
+
+    @PostMapping("/register")
+    public String registerNewUser(@RequestBody UserInfo userInfo) {
+        return employeeService.addUser(userInfo);
+    }
+
+    
 
 
 

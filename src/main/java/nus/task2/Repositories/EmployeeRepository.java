@@ -1,6 +1,5 @@
 package nus.task2.Repositories;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,13 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.PreparedStatementSetter;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import nus.task2.Models.Employee;
+import nus.task2.Models.UserInfo;
 
 @Repository
 public class EmployeeRepository {
@@ -39,6 +36,11 @@ public class EmployeeRepository {
             return result;
 
             
+    }
+
+    public List<UserInfo> getUserInfo(){
+        List<UserInfo> result = jdbcTemplate.query("SELECT * FROM UserInfo", BeanPropertyRowMapper.newInstance(UserInfo.class));
+            return result;
     }
 
     public Employee findEmployeeById(int id){
