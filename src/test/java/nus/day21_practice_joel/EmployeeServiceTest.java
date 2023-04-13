@@ -29,8 +29,8 @@ public class EmployeeServiceTest {
     @Test
     public void getAllEmployees_returnsListOfEmployees() {
         List<Employee> employees = new ArrayList<>();
-        employees.add(new Employee(1, "Bluey", 25, "Train Conductor", 5000));
-        employees.add(new Employee(2, "Bingo", 30, "Architect", 8000));
+        employees.add(new Employee("Bluey", 25, "Train Conductor", 5000, 1));
+        employees.add(new Employee("Bingo", 30, "Architect", 8000, 2));
         Mockito.when(employeeRepository.findAllEmployees(10, 0)).thenReturn(employees);
         List<Employee> result = employeeService.getAllEmployees(10, 0);
         assertEquals(employees, result);
@@ -39,7 +39,7 @@ public class EmployeeServiceTest {
     @Test
     public void getFindEmployeeById_returnsEmployee() {
         int id = 1;
-        Employee employee = new Employee(1, "Bluey", 25, "Teacher", 50000);
+        Employee employee = new Employee("Bluey", 25, "Teacher", 50000, id);
         Mockito.when(employeeRepository.findEmployeeById(id)).thenReturn(employee);
         Employee result = employeeService.getFindEmployeeById(id);
         assertEquals(employee, result);
@@ -47,10 +47,13 @@ public class EmployeeServiceTest {
 
     @Test
     public void getInsertEmployee_returnsTrue() {
-        Employee employee = new Employee(1, "John", 25, "Developer", 5000);
-        Mockito.when(employeeRepository.insertEmployee(employee)).thenReturn(true);
-        Boolean result = employeeService.getInsertEmployee(employee);
-        assertTrue(result);
+        Employee employee = new Employee("John", 25, "Developer", 5000);
+        Mockito.when(employeeRepository.insertEmployee(employee)).thenReturn(1);
+        
+        int result = employeeService.getInsertEmployee(employee);
+        System.out.println("Result: " + result);
+        assertTrue(result > 0);
+
     }
 
     @Test

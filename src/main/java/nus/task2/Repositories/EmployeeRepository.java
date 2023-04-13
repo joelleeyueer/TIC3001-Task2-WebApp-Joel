@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -48,58 +47,85 @@ public class EmployeeRepository {
             Employee customer = jdbcTemplate.queryForObject(findEmployeeId_SQL, BeanPropertyRowMapper.newInstance(Employee.class), id);
             return customer;
 
-        } catch (DataAccessException daex) {
+        } catch (Exception e) {
             // throw new DataAccessResourceFailureException("Customer id " + id + " not found!");
+            System.err.println(e.getMessage());
             return null;
         }
     }
 
-    public Boolean insertEmployee(Employee employee){
-        int inserted = 0;
+    public int insertEmployee(Employee employee){
 
-        inserted = jdbcTemplate.update(insertEmployeeSQL, new PreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement ps) throws SQLException {
-                ps.setString(1, employee.getName());
-                ps.setInt(2, employee.getAge());
-                ps.setString(3, employee.getJobTitle());
-                ps.setInt(4, employee.getSalary());
-            }
-        });
+        try {
+            KeyHolder generatedKeyHolder = new GeneratedKeyHolder(); 
+            PreparedStatementCreator psc = new PreparedStatementCreator() {
+                @Override
+                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                    PreparedStatement ps = con.prepareStatement(insertEmployeeSQL, new String[] {"id"});
+                    ps.setString(1, employee.getName());
+                    ps.setInt(2, employee.getAge());
+                    ps.setString(3, employee.getJobTitle());
+                    ps.setInt(4, employee.getSalary());
+                    return ps;
+                }
+            };
+            jdbcTemplate.update(psc, generatedKeyHolder);
+    
+            Integer empId = generatedKeyHolder.getKey().intValue();
+            System.out.println("Employee has been inserted. Task: "+ employee + "\nEmployeeId added is " + empId);
+            return empId;
 
-        return inserted>0?true:false;
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            return 0;
+        }
+
+        
+        
     }
 
     
     public int updateSalaryByID(int id, int salary) {
-        int updated = 0;
+        try {
+            int updated = 0;
 
-        updated = jdbcTemplate.update(updateSalaryByIDSQL, new PreparedStatementSetter() {
-            // private String name;
-            // private int age;
-            // private String jobTitle;
-            // private int salary;
-            @Override
-            public void setValues(PreparedStatement ps) throws SQLException {
-                ps.setInt(1, salary);
-                ps.setInt(2, id);
-            }
-        });
-
-        return updated;
+            updated = jdbcTemplate.update(updateSalaryByIDSQL, new PreparedStatementSetter() {
+                // private String name;
+                // private int age;
+                // private String jobTitle;
+                // private int salary;
+                @Override
+                public void setValues(PreparedStatement ps) throws SQLException {
+                    ps.setInt(1, salary);
+                    ps.setInt(2, id);
+                }
+            });
+    
+            return updated;
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            return 0;
+        }
+        
     }
 
     public int deleteById(int id) {
-        int deleted = 0;
+        try {
+            int deleted = 0;
 
-        deleted = jdbcTemplate.update(deleteByIdSQL, new PreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement ps) throws SQLException {
-                ps.setInt(1, id);
-            }
-        });
-
-        return deleted;
+            deleted = jdbcTemplate.update(deleteByIdSQL, new PreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps) throws SQLException {
+                    ps.setInt(1, id);
+                }
+            });
+    
+            return deleted;
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            return 0;
+        }
+        
     }
     
 }

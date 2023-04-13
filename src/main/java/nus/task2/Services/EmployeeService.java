@@ -24,7 +24,7 @@ public class EmployeeService {
         return employeeRepositories.findEmployeeById(id);
     }
 
-    public Boolean getInsertEmployee(Employee employee){
+    public int getInsertEmployee(Employee employee){
         return employeeRepositories.insertEmployee(employee);
     }
 
